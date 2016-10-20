@@ -518,8 +518,13 @@ public class HVScrollView extends FrameLayout {
     *计算两指触屏的时候两个手指之间的距离
     */
     private float spacing(MotionEvent ev) {
-        float x = ev.getX(0) - ev.getX(1);
-        float y = ev.getY(0) - ev.getY(1);
+        float x = 0,y = 0;
+        try {
+            x = ev.getX(0) - ev.getX(1);
+            y = ev.getY(0) - ev.getY(1);
+        }catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
         return (float) Math.sqrt(x * x + y * y);
     }
 
@@ -646,6 +651,7 @@ public class HVScrollView extends FrameLayout {
                 }
                 break;
             case MotionEvent.ACTION_POINTER_UP:
+                mode = MODE_DRAG;
                 onSecondaryPointerUp(ev);
                 break;
         }
