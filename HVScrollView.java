@@ -34,7 +34,7 @@ public class HVScrollView extends FrameLayout {
     private static final int MODE_DRAG = 0;
     private static final int MODE_ZOOM = 1;
     private int mode = 0;
-    
+
     //手指间距离
     private float oldDist = 1;
     private float newDist = 1;
@@ -43,8 +43,8 @@ public class HVScrollView extends FrameLayout {
     private float lastScale = 1;
 
     //缩放比例
-    private static final float ZOOM_MIN = (float)0.8;
-    private static final float ZOOM_MAX = (float)4;
+    private static final float ZOOM_MIN = (float) 0.8;
+    private static final float ZOOM_MAX = (float) 1.5;
 
 
     static final int ANIMATED_SCROLL_GAP = 250;
@@ -518,11 +518,11 @@ public class HVScrollView extends FrameLayout {
     *计算两指触屏的时候两个手指之间的距离
     */
     private float spacing(MotionEvent ev) {
-        float x = 0,y = 0;
+        float x = 0, y = 0;
         try {
             x = ev.getX(0) - ev.getX(1);
             y = ev.getY(0) - ev.getY(1);
-        }catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
         return (float) Math.sqrt(x * x + y * y);
@@ -583,18 +583,29 @@ public class HVScrollView extends FrameLayout {
                     float scale = newDist / oldDist;
                     oldDist = newDist;                  //更新手指间距
                     scale *= lastScale;
-                    if ((getWidth() * ZOOM_MIN <= linearLayout.getWidth() * scale &&                 //缩放范围为长或宽的 0.8倍-4倍
+                    /*if ((getWidth() * ZOOM_MIN <= linearLayout.getWidth() * scale &&                 //缩放范围为长或宽的 0.8倍-4倍
                             getHeight() * ZOOM_MIN <= linearLayout.getHeight() * scale) &&
                             getWidth() * ZOOM_MAX >= linearLayout.getWidth() * scale &&
                             getHeight() * ZOOM_MAX >= linearLayout.getHeight() * scale) {
                         lastScale = scale;
-                    } else if (scale < 1) {         //进行缩小操作
+                    } else if (scale < lastScale) {         //进行缩小操作
                         scale = lastScale = (getWidth() * ZOOM_MIN <= linearLayout.getWidth() * scale ?
                                 getHeight() * ZOOM_MIN / linearLayout.getHeight() : getWidth() * ZOOM_MIN / linearLayout.getWidth());
+
                     } else {                        //进行放大操作
                         scale = lastScale = (getWidth() * ZOOM_MAX >= linearLayout.getWidth() * scale ?
                                 getHeight() * ZOOM_MAX / linearLayout.getHeight() : getWidth() * ZOOM_MAX / linearLayout.getWidth());
+                        scale = lastScale = ZOOM_MAX/2;
+                    }*/
+                    if (ZOOM_MIN <= scale && scale <= ZOOM_MAX) {       //缩放范围为ZOOM_MIN倍 到 ZOOM_MAX倍
+                        lastScale = scale;
+                    } else if (scale < lastScale) {
+                        lastScale = scale = ZOOM_MIN;
+                    } else {
+                        lastScale = scale = ZOOM_MAX;
                     }
+
+                    System.out.println(scale);
                     //使用ViewHelper对LinearLayout进行放大缩小
                     ViewHelper.setScaleX(linearLayout, scale);
                     ViewHelper.setScaleY(linearLayout, scale);
@@ -1437,7 +1448,7 @@ public class HVScrollView extends FrameLayout {
     /**
      * When looking for focus in children of a scroll view, need to be a little
      * more careful not to give focus to something that is scrolled off screen.
-     * <p>
+     * <p/>
      * This is more expensive than the default {@link android.view.ViewGroup}
      * implementation, otherwise this behavior might have been made the default.
      */
@@ -1578,7 +1589,7 @@ public class HVScrollView extends FrameLayout {
 
     /**
      * {@inheritDoc}
-     * <p>
+     * <p/>
      * <p>This version also clamps the scrolling to the bounds of our child.
      */
     @Override
